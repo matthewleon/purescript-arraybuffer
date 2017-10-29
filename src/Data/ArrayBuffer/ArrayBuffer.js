@@ -1,7 +1,5 @@
 "use strict";
 
-// module Data.ArrayBuffer
-
 exports.byteLength = function(a) {
   return a.byteLength;
 }

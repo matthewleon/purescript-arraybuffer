@@ -1,4 +1,4 @@
-module Data.ArrayBuffer (
+module Data.ArrayBuffer.ArrayBuffer (
   byteLength
 , slice
 ) where
