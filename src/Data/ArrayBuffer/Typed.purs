@@ -18,7 +18,7 @@ module Data.ArrayBuffer.Typed( asInt8Array
 
 import Prelude
 import Control.Monad.Eff (Eff)
-import Data.ArrayBuffer.ArrayBuffer (ARRAY_BUFFER)
+import Data.ArrayBuffer (ARRAY_BUFFER)
 import Data.ArrayBuffer.Types (ArrayView, ByteOffset, DataView, Float64Array, Float32Array, Uint8ClampedArray, Uint32Array, Uint16Array, Uint8Array, Int32Array, Int16Array, Int8Array)
 import Data.Function.Uncurried (Fn2, Fn3, runFn2, runFn3)
 import Data.Maybe (Maybe(..))

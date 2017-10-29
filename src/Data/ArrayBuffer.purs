@@ -1,10 +1,10 @@
-module Data.ArrayBuffer.ArrayBuffer( ARRAY_BUFFER()
-                                   , create
-                                   , byteLength
-                                   , slice
-                                   , fromArray
-                                   , fromString
-                                   ) where
+module Data.ArrayBuffer ( ARRAY_BUFFER()
+                        , create
+                        , byteLength
+                        , slice
+                        , fromArray
+                        , fromString
+                        ) where
 
 import Control.Monad.Eff (kind Effect, Eff)
 import Data.Function.Uncurried (Fn3, runFn3)
