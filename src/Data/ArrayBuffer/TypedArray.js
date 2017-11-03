@@ -83,3 +83,4 @@ exports.bytesPerElement = function (isArrayType) {
 
 exports.int8ArrayConstructor = Int8Array;
 exports.uint8ArrayConstructor = Uint8Array;
+exports.float32ArrayConstructor = Float32Array;

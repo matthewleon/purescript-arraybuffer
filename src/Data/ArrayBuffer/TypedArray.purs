@@ -93,7 +93,7 @@ module Data.ArrayBuffer.TypedArray (
 ) where
 
 import Data.Array as A
-import Data.ArrayBuffer.Types (ArrayBuffer, ArrayView, Int8Array, Uint8Array, Int8, Uint8)
+import Data.ArrayBuffer.Types (ArrayBuffer, ArrayView, Int8Array, Uint8Array, Float32Array, Int8, Uint8, Float32)
 import Data.Maybe (Maybe)
 import Prelude ((<<<))
 import Unsafe.Coerce (unsafeCoerce)
@@ -154,3 +154,4 @@ instance arrayTypeUint8Array :: IsArrayType (ArrayView Uint8) Int
 
 foreign import int8ArrayConstructor :: Constructor Int8Array
 foreign import uint8ArrayConstructor :: Constructor Uint8Array
+foreign import float32ArrayConstructor :: Constructor Float32Array
