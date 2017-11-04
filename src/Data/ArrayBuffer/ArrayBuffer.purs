@@ -1,6 +1,7 @@
 module Data.ArrayBuffer.ArrayBuffer (
   byteLength
 , slice
+, module Data.ArrayBuffer.Types
 ) where
 
 import Data.Function.Uncurried (Fn3, runFn3)
