@@ -1,6 +1,9 @@
 module Data.ArrayBuffer.DataView (
   Getter
 , fromArrayBuffer
+, buffer
+, byteLength
+, byteOffset
 , getInt8
 , getInt16be
 , getInt32be
@@ -26,6 +29,12 @@ type Getter r = DataView -> ByteOffset -> Maybe r
 
 -- | View mapping an `ArrayBuffer`.
 foreign import fromArrayBuffer :: ArrayBuffer -> DataView
+
+foreign import buffer :: DataView -> ArrayBuffer
+
+foreign import byteLength :: DataView -> Int
+
+foreign import byteOffset :: DataView -> ByteOffset
 
 type Endianness = Boolean
 
