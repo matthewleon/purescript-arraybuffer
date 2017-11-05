@@ -8,6 +8,24 @@ var ctor = function (dictIsArrayType) {
 
 exports.fromArray = ctor;
 exports.fromArrayBuffer = ctor;
+
+exports.fromArrayBufferWithOffset = function (dictIsArrayType) {
+  return function (arr) {
+    return function (byteOffset) {
+      return new dictIsArrayType.constructor(arr, byteOffset);
+    };
+  };
+};
+
+exports.fromArrayBufferWithOffsetAndLength = function (dictIsArrayType) {
+  return function (arr) {
+    return function (byteOffset) {
+      return function (length) {
+        return new dictIsArrayType.constructor(arr, byteOffset);
+      };
+    };
+  };
+};
 exports.fromTypedArray = ctor;
 
 exports.buffer = function (av) {

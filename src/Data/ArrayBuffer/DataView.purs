@@ -18,6 +18,8 @@ module Data.ArrayBuffer.DataView (
 , getUint32le
 , getFloat32le
 , getFloat64le
+--, getTypedArray
+--, getTypedArrayWithLength
 ) where
 
 import Data.ArrayBuffer.Types (ArrayBuffer, ByteLength, ByteOffset, DataView)
@@ -92,3 +94,10 @@ getFloat64be = getter "getFloat64" 8 false
 
 getFloat64le :: Getter Number
 getFloat64le = getter "getFloat64" 8 true
+
+{-
+getTypedArray :: forall t. Getter (ArrayView t)
+getTyepdArray dv bo = buffer dv
+
+getTypedArrayWithLength :: forall t. Int -> Getter (ArrayView t)
+-}

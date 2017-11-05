@@ -93,7 +93,7 @@ module Data.ArrayBuffer.TypedArray (
 ) where
 
 import Data.Array as A
-import Data.ArrayBuffer.Types (ArrayBuffer, ArrayView, Int8Array, Uint8Array, Float32Array, Int8, Uint8, Float32)
+import Data.ArrayBuffer.Types (ArrayBuffer, ArrayView, ByteOffset, Int8Array, Uint8Array, Float32Array, Int8, Uint8, Float32)
 import Data.Maybe (Maybe)
 import Prelude ((<<<))
 import Unsafe.Coerce (unsafeCoerce)
@@ -101,6 +101,10 @@ import Unsafe.Coerce (unsafeCoerce)
 foreign import fromArray :: forall t m. IsArrayType t m => Array m -> t
 
 foreign import fromArrayBuffer :: forall t m. IsArrayType t m => ArrayBuffer -> t
+
+foreign import fromArrayBufferWithOffset :: forall t m. IsArrayType t m => ArrayBuffer -> ByteOffset -> t
+
+foreign import fromArrayBufferWithOffsetAndLength :: forall t m. IsArrayType t m => ArrayBuffer -> ByteOffset -> Int -> t
 
 foreign import fromTypedArray :: forall t t'. ArrayView t -> ArrayView t'
 
