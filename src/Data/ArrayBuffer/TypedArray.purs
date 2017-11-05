@@ -94,7 +94,7 @@ module Data.ArrayBuffer.TypedArray (
 
 import Data.Array as A
 import Data.ArrayBuffer.Types (ArrayBuffer, ArrayView, ByteOffset, Int8Array, Uint8Array, Float32Array, Int8, Uint8, Float32)
-import Data.Maybe (Maybe)
+import Data.Maybe (Maybe(..))
 import Prelude ((<<<))
 import Unsafe.Coerce (unsafeCoerce)
 
@@ -102,9 +102,42 @@ foreign import fromArray :: forall t m. IsArrayType t m => Array m -> t
 
 foreign import fromArrayBuffer :: forall t m. IsArrayType t m => ArrayBuffer -> t
 
-foreign import fromArrayBufferWithOffset :: forall t m. IsArrayType t m => ArrayBuffer -> ByteOffset -> t
+fromArrayBufferWithOffset
+  :: forall t m
+   . IsArrayType t m
+  => ArrayBuffer
+  -> ByteOffset
+  -> Maybe t
+fromArrayBufferWithOffset = fromArrayBufferWithOffsetImpl Just Nothing
 
-foreign import fromArrayBufferWithOffsetAndLength :: forall t m. IsArrayType t m => ArrayBuffer -> ByteOffset -> Int -> t
+foreign import fromArrayBufferWithOffsetImpl
+  :: forall t m
+   . IsArrayType t m
+  => (forall r. r -> Maybe r)
+  -> (forall r. Maybe r)
+  -> ArrayBuffer
+  -> ByteOffset
+  -> Maybe t
+
+fromArrayBufferWithOffsetAndLength
+  :: forall t m
+   . IsArrayType t m
+  => ArrayBuffer
+  -> ByteOffset
+  -> Int
+  -> Maybe t
+fromArrayBufferWithOffsetAndLength =
+  fromArrayBufferWithOffsetAndLengthImpl Just Nothing
+
+foreign import fromArrayBufferWithOffsetAndLengthImpl
+  :: forall t m
+   . IsArrayType t m
+  => (forall r. r -> Maybe r)
+  -> (forall r. Maybe r)
+  -> ArrayBuffer
+  -> ByteOffset
+  -> Int
+  -> Maybe t
 
 foreign import fromTypedArray :: forall t t'. ArrayView t -> ArrayView t'
 

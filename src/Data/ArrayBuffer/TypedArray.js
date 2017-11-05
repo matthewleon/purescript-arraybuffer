@@ -9,19 +9,39 @@ var ctor = function (dictIsArrayType) {
 exports.fromArray = ctor;
 exports.fromArrayBuffer = ctor;
 
-exports.fromArrayBufferWithOffset = function (dictIsArrayType) {
-  return function (arr) {
-    return function (byteOffset) {
-      return new dictIsArrayType.constructor(arr, byteOffset);
+exports.fromArrayBufferWithOffsetImpl = function (dictIsArrayType) {
+  return function (just) {
+    return function (nothing) {
+      return function (arr) {
+        return function (byteOffset) {
+          try {
+            return just(new dictIsArrayType.constructor(arr, byteOffset));
+          }
+          catch (e) {
+            if (e instanceof RangeError) return nothing;
+            else throw e;
+          }
+        };
+      };
     };
   };
 };
 
-exports.fromArrayBufferWithOffsetAndLength = function (dictIsArrayType) {
-  return function (arr) {
-    return function (byteOffset) {
-      return function (length) {
-        return new dictIsArrayType.constructor(arr, byteOffset);
+exports.fromArrayBufferWithOffsetAndLengthImpl = function (dictIsArrayType) {
+  return function (just) {
+    return function (nothing) {
+      return function (arr) {
+        return function (byteOffset) {
+          return function (length) {
+            try {
+              return just(new dictIsArrayType.constructor(arr, byteOffset));
+            }
+            catch (e) {
+              if (e instanceof RangeError) return nothing;
+              else throw e;
+            }
+          };
+        };
       };
     };
   };
