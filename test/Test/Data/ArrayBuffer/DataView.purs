@@ -2,15 +2,27 @@ module Test.Data.ArrayBuffer.DataView where
 
 import Prelude
 
-import Control.Monad.Eff (Eff)
-import Control.Monad.Eff.Console (CONSOLE, logShow)
+import Data.Array as A
 import Data.ArrayBuffer.DataView as DV
 import Data.ArrayBuffer.TypedArray as TA
+import Data.NonEmpty (NonEmpty)
+import Data.Ord (abs)
+import Test.QuickCheck (class Arbitrary, arbitrary)
+import Test.QuickCheck.Gen (Gen, chooseInt)
+import Test.Spec (Spec, describe, it)
+import Test.Spec.QuickCheck (QCRunnerEffects, quickCheck)
 
-testDataView :: forall e. Eff ( console :: CONSOLE | e ) Unit
-testDataView = do
-  let arr = [100, 101, 102, 103]
-      dv  = DV.fromArrayBuffer <<< TA.buffer $ (TA.fromArray arr :: TA.Int8Array)
-  logShow arr
-  logShow $ DV.getInt8 dv 0
-  logShow $ DV.getInt8 dv 1
+testDataView :: Spec (QCRunnerEffects ()) Unit
+testDataView = describe "DataView" do
+  it "correctly gets 8-bit integers" $
+    quickCheck \(NonEmptyUntypedInt8Array xs) ->
+      let i8a = (TA.fromArray xs) :: TA.Int8Array
+          index = chooseInt 0 (A.length xs - 1)
+      in  index <#> \i ->
+            A.index xs i == DV.getInt8 (DV.fromArrayBuffer $ TA.buffer i8a) i
+
+newtype NonEmptyUntypedInt8Array = NonEmptyUntypedInt8Array (Array Int)
+instance arbitraryNonEmptyUntypedInt8Array :: Arbitrary NonEmptyUntypedInt8Array where
+  arbitrary = NonEmptyUntypedInt8Array <<< 
+    map intToInt8 <$> A.fromFoldable <$> (arbitrary :: Gen (NonEmpty Array Int))
+    where intToInt8 x = 127 - (abs x `mod` 256)
