@@ -15,7 +15,9 @@ module Data.ArrayBuffer.TypedArray.Raw (
 --TODO (typing is a bit hairy), toLocaleString
 , toString
 ) where 
-import Data.ArrayBuffer.TypedArray (class IsArrayType, ArrayView)
+
+import Data.ArrayBuffer.Types (ArrayView)
+import Data.ArrayBuffer.TypedArray.Class (class IsArrayType)
 
 foreign import every :: forall t m. IsArrayType t m => (m -> Int -> t -> Boolean) -> t -> Boolean
 

@@ -118,7 +118,3 @@ exports.bytesPerElement = function (isArrayType) {
   return isArrayType.constructor.BYTES_PER_ELEMENT;
 };
 */
-
-exports.int8ArrayConstructor = Int8Array;
-exports.uint8ArrayConstructor = Uint8Array;
-exports.float32ArrayConstructor = Float32Array;

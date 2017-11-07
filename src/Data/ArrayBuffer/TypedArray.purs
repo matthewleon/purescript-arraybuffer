@@ -1,8 +1,5 @@
 module Data.ArrayBuffer.TypedArray (
-  class IsArrayType
-, constructor
-, Constructor
-, fromArray
+  fromArray
 , fromArrayBuffer
 , fromTypedArray
 , buffer
@@ -83,19 +80,24 @@ module Data.ArrayBuffer.TypedArray (
 , unsafeIndex
 
 
--- methods
+-- typeclassy methods
+, show
 , every
 , map
 , foldl
 --, bytesPerElement
 
 , module Data.ArrayBuffer.Types
+, module Data.ArrayBuffer.TypedArray.Class
 ) where
 
+import Prelude
+
 import Data.Array as A
-import Data.ArrayBuffer.Types (ArrayBuffer, ArrayView, ByteOffset, Int8Array, Uint8Array, Float32Array, Int8, Uint8, Float32)
+import Data.ArrayBuffer.TypedArray.Raw as Raw
+import Data.ArrayBuffer.Types (ArrayBuffer, ArrayView, ByteOffset, Int8Array, Uint8Array, Int16Array, Uint16Array, Int32Array, Uint32Array, Float32Array)
+import Data.ArrayBuffer.TypedArray.Class (class IsArrayType, Constructor, constructor)
 import Data.Maybe (Maybe(..))
-import Prelude ((<<<))
 import Unsafe.Coerce (unsafeCoerce)
 
 foreign import fromArray :: forall t m. IsArrayType t m => Array m -> t
@@ -162,6 +164,9 @@ index = A.index <<< unsafeCoerce
 -- | An infix version of `index`.
 infixl 8 index as !!
 
+show :: forall t. ArrayView t -> String
+show xs = "fromArray [" <> Raw.toString xs <> "]"
+
 foreign import every :: forall t m. IsArrayType t m => (m -> Boolean) -> t -> Boolean
 
 foreign import filter :: forall t m. IsArrayType t m => (m -> Boolean) -> t -> t
@@ -176,19 +181,5 @@ unsafeIndex = unsafeIndexImpl
 
 foreign import unsafeIndexImpl :: forall t m. IsArrayType t m => t -> Int -> m
 
-class IsArrayType t m | t -> m where
-  constructor :: Constructor t
-
-data Constructor t
-
 -- TODO
 --foreign import bytesPerElement :: forall t m. IsArrayType t m => Int
-
-instance arrayTypeInt8Array :: IsArrayType (ArrayView Int8) Int
-  where constructor = int8ArrayConstructor
-instance arrayTypeUint8Array :: IsArrayType (ArrayView Uint8) Int
-  where constructor = uint8ArrayConstructor
-
-foreign import int8ArrayConstructor :: Constructor Int8Array
-foreign import uint8ArrayConstructor :: Constructor Uint8Array
-foreign import float32ArrayConstructor :: Constructor Float32Array

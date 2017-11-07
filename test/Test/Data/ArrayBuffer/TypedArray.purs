@@ -6,7 +6,6 @@ import Control.Monad.Eff (Eff)
 import Control.Monad.Eff.Console (CONSOLE, log, logShow)
 import Control.Monad.Eff.Unsafe (unsafePerformEff)
 import Data.ArrayBuffer.TypedArray as TA
-import Data.ArrayBuffer.TypedArray.Raw as TAR
 import Node.Buffer as NB
 
 testTypedArray :: forall e. Eff ( console :: CONSOLE | e ) Unit
@@ -16,7 +15,9 @@ testTypedArray =
       ab  = unsafePerformEff $ NB.toArrayBuffer nb
   in do
     logShow nb
-    log $ TAR.toString (TA.fromArrayBuffer ab :: TA.Int8Array)
+    log $ TA.show (TA.fromArrayBuffer ab :: TA.Int8Array)
+    log $ TA.show (TA.fromArrayBuffer ab :: TA.Int16Array)
+    log $ TA.show (TA.fromArrayBuffer ab :: TA.Int32Array)
 
 unsafeArrayToNodeBuffer :: Array NB.Octet -> NB.Buffer
 unsafeArrayToNodeBuffer = unsafePerformEff <<< NB.fromArray
