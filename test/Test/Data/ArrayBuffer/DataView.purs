@@ -2,10 +2,6 @@ module Test.Data.ArrayBuffer.DataView where
 
 import Prelude
 
-{-
-import Control.Monad.Eff.Console (log, logShow)
-import Control.Monad.Eff.Unsafe (unsafePerformEff)
--}
 import Data.Array as A
 import Data.ArrayBuffer.DataView as DV
 import Data.ArrayBuffer.TypedArray as TA
@@ -41,9 +37,9 @@ testDataView = describe "DataView" do
             index = chooseInt 0 (A.length xs - 1)
         in  index <#> \i -> 
               let byteIndex = i * 2
-              in isJust (A.index xs i)
-                 && A.index xs i
-                    == DV.getInt16le (DV.fromArrayBuffer $ TA.buffer i16a) byteIndex
+              in  isJust (A.index xs i)
+                  && A.index xs i
+                     == DV.getInt16le (DV.fromArrayBuffer $ TA.buffer i16a) byteIndex
     it "returns Nothing for out of range index" $
       quickCheck \xs i ->
         let i16a = (TA.fromArray xs) :: TA.Int16Array
@@ -51,6 +47,30 @@ testDataView = describe "DataView" do
             byteIndex = index * 2
         in  A.index xs index == Nothing
             && DV.getInt16le (DV.fromArrayBuffer $ TA.buffer i16a) byteIndex
+               == Nothing
+
+  describe "getInt16be" $ do
+    it "correctly gets 16-bit integers" $
+      quickCheck \(NonEmptyUntypedInt16Array xs) ->
+        let i16a = (TA.fromArray xs) :: TA.Int16Array
+            index = chooseInt 0 (A.length xs - 1)
+        in  index <#> \i ->
+              let byteIndex = i * 2
+                  byteFlippedFromArray =
+                    flip DV.getInt16be 0
+                    =<< DV.fromArrayBuffer <<< TA.buffer
+                    <$> ((TA.fromArray <<< A.singleton <$> A.index xs i)
+                         :: Maybe TA.Int16Array)
+              in isJust byteFlippedFromArray
+                 && byteFlippedFromArray
+                    == DV.getInt16be (DV.fromArrayBuffer $ TA.buffer i16a) byteIndex
+    it "returns Nothing for out of range index" $
+      quickCheck \xs i ->
+        let i16a = (TA.fromArray xs) :: TA.Int16Array
+            index = A.length xs + i
+            byteIndex = index * 2
+        in  A.index xs index == Nothing
+            && DV.getInt16be (DV.fromArrayBuffer $ TA.buffer i16a) byteIndex
                == Nothing
 
 newtype NonEmptyUntypedInt8Array = NonEmptyUntypedInt8Array (Array Int)
