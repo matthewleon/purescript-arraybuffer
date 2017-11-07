@@ -1,7 +1,7 @@
 "use strict";
 
-exports.fromArrayBuffer = function(ab) {
-  return new DataView(ab);
+exports.fromArrayBuffer = function(arrayBuffer) {
+  return new DataView(arrayBuffer);
 };
 
 exports.getterImpl = function(just, nothing, getterName, length, endianness, dataView, offset) {
@@ -14,14 +14,14 @@ exports.getterImpl = function(just, nothing, getterName, length, endianness, dat
   }
 };
 
-exports.buffer = function(dv) {
-  return dv.buffer;
+exports.buffer = function(dataView) {
+  return dataView.buffer;
 };
 
-exports.byteLength = function(dv) {
-  return dv.byteLength;
+exports.byteLength = function(dataView) {
+  return dataView.byteLength;
 };
 
-exports.byteOffset = function(dv) {
-  return dv.byteLength;
+exports.byteOffset = function(dataView) {
+  return dataView.byteLength;
 };
