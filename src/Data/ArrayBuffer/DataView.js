@@ -4,8 +4,14 @@ exports.fromArrayBuffer = function(ab) {
   return new DataView(ab);
 };
 
-exports.getterImpl = function(just, nothing, s, l, e, v, o) {
-  return ((o + l)>>>0) <= v.byteLength? just(v[s].call(v,o,e)) : nothing;
+exports.getterImpl = function(just, nothing, getterName, length, endianness, dataView, offset) {
+  try {
+    return just(dataView[getterName](offset, endianness));
+  }
+  catch (e) {
+    if (e instanceof RangeError) return nothing;
+    else throw e;
+  }
 };
 
 exports.buffer = function(dv) {
