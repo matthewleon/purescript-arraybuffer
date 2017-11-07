@@ -95,7 +95,7 @@ import Prelude
 
 import Data.Array as A
 import Data.ArrayBuffer.TypedArray.Raw as Raw
-import Data.ArrayBuffer.Types (ArrayBuffer, ArrayView, ByteOffset, Int8Array, Uint8Array, Int16Array, Uint16Array, Int32Array, Uint32Array, Float32Array)
+import Data.ArrayBuffer.Types (ArrayBuffer, ArrayView, ByteOffset, Int8Array, Uint8Array, Uint8ClampedArray, Int16Array, Uint16Array, Int32Array, Uint32Array, Float32Array, Float64Array)
 import Data.ArrayBuffer.TypedArray.Class (class IsArrayType, Constructor, constructor)
 import Data.Maybe (Maybe(..))
 import Unsafe.Coerce (unsafeCoerce)
