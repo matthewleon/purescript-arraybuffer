@@ -1,6 +1,8 @@
 module Data.ArrayBuffer.TypedArray (
   fromArray
 , fromArrayBuffer
+, fromArrayBufferWithOffset
+, fromArrayBufferWithOffsetAndLength
 , fromTypedArray
 , buffer
 , byteLength

@@ -34,7 +34,7 @@ exports.fromArrayBufferWithOffsetAndLengthImpl = function (dictIsArrayType) {
         return function (byteOffset) {
           return function (length) {
             try {
-              return just(new dictIsArrayType.constructor(arr, byteOffset));
+              return just(new dictIsArrayType.constructor(arr, byteOffset, length));
             }
             catch (e) {
               if (e instanceof RangeError) return nothing;
