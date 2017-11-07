@@ -21,8 +21,5 @@
     "purescript-console": "^3.0.0",
     "purescript-st": "^3.0.0",
     "purescript-uint": "^0.5.0"
-  },
-  "devDependencies": {
-    "purescript-node-buffer": "matthewleon/purescript-node-buffer#toArrayBuffer"
   }
 }
