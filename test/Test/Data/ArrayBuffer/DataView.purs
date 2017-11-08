@@ -175,15 +175,58 @@ testDataView = describe "DataView" do
             && DV.getUint16be (DV.fromArrayBuffer $ TA.buffer u16a) byteIndex
                == Nothing
 
+  describe "getUint32le" $ do
+    it "correctly gets 32-bit unsigned integers" $
+      quickCheck \(NonEmptyUntypedUint32Array xs) ->
+        let u32a = (TA.fromArray xs) :: TA.Uint32Array
+            index = chooseInt 0 (A.length xs - 1)
+        in  index <#> \i -> 
+              let byteIndex = i * 4
+              in  isJust (A.index xs i)
+                  && A.index xs i
+                     == DV.getUint32le (DV.fromArrayBuffer $ TA.buffer u32a) byteIndex
+    it "returns Nothing for out of range index" $
+      quickCheck \(NonEmptyUntypedUint32Array xs) i ->
+        let u32a = (TA.fromArray xs) :: TA.Uint32Array
+            index = A.length xs + i
+            byteIndex = index * 4
+        in  A.index xs index == Nothing
+            && DV.getUint32le (DV.fromArrayBuffer $ TA.buffer u32a) byteIndex
+               == Nothing
+
+  describe "getUInt32be" $ do
+    it "correctly gets 32-bit unsigned integers" $
+      quickCheck \(NonEmptyUntypedUint32Array xs) ->
+        let u32a = (TA.fromArray xs) :: TA.Uint32Array
+            index = chooseInt 0 (A.length xs - 1)
+        in  index <#> \i ->
+              let byteIndex = i * 4
+                  byteFlippedFromArray =
+                    flip DV.getUint32be 0
+                    =<< DV.fromArrayBuffer <<< TA.buffer
+                    <$> ((TA.fromArray <<< A.singleton <$> A.index xs i)
+                         :: Maybe TA.Uint32Array)
+              in isJust byteFlippedFromArray
+                 && byteFlippedFromArray
+                    == DV.getUint32be (DV.fromArrayBuffer $ TA.buffer u32a) byteIndex
+    it "returns Nothing for out of range index" $
+      quickCheck \(NonEmptyUntypedUint32Array xs) i ->
+        let u32a = (TA.fromArray xs) :: TA.Uint32Array
+            index = A.length xs + i
+            byteIndex = index * 4
+        in  A.index xs index == Nothing
+            && DV.getUint32be (DV.fromArrayBuffer $ TA.buffer u32a) byteIndex
+               == Nothing
+
 newtype NonEmptyUntypedInt8Array = NonEmptyUntypedInt8Array (Array Int)
 instance arbitraryNonEmptyUntypedInt8Array :: Arbitrary NonEmptyUntypedInt8Array where
-  arbitrary = NonEmptyUntypedInt8Array <<< 
+  arbitrary = NonEmptyUntypedInt8Array <<<
     map intToInt8 <$> A.fromFoldable <$> (arbitrary :: Gen (NonEmpty Array Int))
     where intToInt8 x = 127 - (abs x `mod` 256)
 
 newtype NonEmptyUntypedInt16Array = NonEmptyUntypedInt16Array (Array Int)
 instance arbitraryNonEmptyUntypedInt16Array :: Arbitrary NonEmptyUntypedInt16Array where
-  arbitrary = NonEmptyUntypedInt16Array <<< 
+  arbitrary = NonEmptyUntypedInt16Array <<<
     map intToInt16 <$> A.fromFoldable <$> (arbitrary :: Gen (NonEmpty Array Int))
     where intToInt16 x = 32767 - (abs x `mod` 65536)
 
@@ -194,12 +237,17 @@ instance arbitraryNonEmptyUntypedInt32Array :: Arbitrary NonEmptyUntypedInt32Arr
 
 newtype NonEmptyUntypedUint8Array = NonEmptyUntypedUint8Array (Array U.UInt)
 instance arbitraryNonEmptyUntypedUint8Array :: Arbitrary NonEmptyUntypedUint8Array where
-  arbitrary = NonEmptyUntypedUint8Array <<< 
+  arbitrary = NonEmptyUntypedUint8Array <<<
     map intToUint8 <$> A.fromFoldable <$> (arbitrary :: Gen (NonEmpty Array Int))
     where intToUint8 x = U.fromInt x `mod` U.fromInt 256
 
 newtype NonEmptyUntypedUint16Array = NonEmptyUntypedUint16Array (Array U.UInt)
 instance arbitraryNonEmptyUntypedUint16Array :: Arbitrary NonEmptyUntypedUint16Array where
-  arbitrary = NonEmptyUntypedUint16Array <<< 
+  arbitrary = NonEmptyUntypedUint16Array <<<
     map intToUint16 <$> A.fromFoldable <$> (arbitrary :: Gen (NonEmpty Array Int))
     where intToUint16 x = U.fromInt x `mod` U.fromInt 65536
+
+newtype NonEmptyUntypedUint32Array = NonEmptyUntypedUint32Array (Array U.UInt)
+instance arbitraryNonEmptyUntypedUint32Array :: Arbitrary NonEmptyUntypedUint32Array where
+  arbitrary = NonEmptyUntypedUint32Array <<<
+    map U.fromInt <$> A.fromFoldable <$> (arbitrary :: Gen (NonEmpty Array Int))
