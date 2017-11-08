@@ -242,6 +242,30 @@ testDataView = describe "DataView" do
             && DV.getUint32be (DV.fromArrayBuffer $ TA.buffer f32a) byteIndex
                == Nothing
 
+  describe "getFloat32be" $ do
+    it "correctly gets 32-bit float" $
+      quickCheck \(NonEmptyUntypedNumberArray xs) ->
+        let f32a = (TA.fromArray xs) :: TA.Float32Array
+            index = chooseInt 0 (A.length xs - 1)
+        in  index <#> \i ->
+              let byteIndex = i * 4
+                  float32beFromArray =
+                    flip DV.getFloat32be 0
+                    =<< DV.fromArrayBuffer <<< TA.buffer
+                    <$> ((TA.fromArray <<< A.singleton <$> A.index xs i)
+                         :: Maybe TA.Float32Array)
+              in isJust float32beFromArray
+                 && float32beFromArray
+                    == DV.getFloat32be (DV.fromArrayBuffer $ TA.buffer f32a) byteIndex
+    it "returns Nothing for out of range index" $
+      quickCheck \(NonEmptyUntypedUint32Array xs) i ->
+        let f32a = (TA.fromArray xs) :: TA.Uint32Array
+            index = A.length xs + i
+            byteIndex = index * 4
+        in  A.index xs index == Nothing
+            && DV.getUint32be (DV.fromArrayBuffer $ TA.buffer f32a) byteIndex
+               == Nothing
+
 newtype NonEmptyUntypedInt8Array = NonEmptyUntypedInt8Array (Array Int)
 instance arbitraryNonEmptyUntypedInt8Array :: Arbitrary NonEmptyUntypedInt8Array where
   arbitrary = NonEmptyUntypedInt8Array <<<
