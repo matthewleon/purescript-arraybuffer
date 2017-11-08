@@ -92,6 +92,30 @@ testDataView = describe "DataView" do
             && DV.getInt32le (DV.fromArrayBuffer $ TA.buffer i32a) byteIndex
                == Nothing
 
+  describe "getInt32be" $ do
+    it "correctly gets 32-bit integers" $
+      quickCheck \(NonEmptyUntypedInt32Array xs) ->
+        let i32a = (TA.fromArray xs) :: TA.Int32Array
+            index = chooseInt 0 (A.length xs - 1)
+        in  index <#> \i ->
+              let byteIndex = i * 4
+                  byteFlippedFromArray =
+                    flip DV.getInt32be 0
+                    =<< DV.fromArrayBuffer <<< TA.buffer
+                    <$> ((TA.fromArray <<< A.singleton <$> A.index xs i)
+                         :: Maybe TA.Int32Array)
+              in isJust byteFlippedFromArray
+                 && byteFlippedFromArray
+                    == DV.getInt32be (DV.fromArrayBuffer $ TA.buffer i32a) byteIndex
+    it "returns Nothing for out of range index" $
+      quickCheck \xs i ->
+        let i32a = (TA.fromArray xs) :: TA.Int32Array
+            index = A.length xs + i
+            byteIndex = index * 4
+        in  A.index xs index == Nothing
+            && DV.getInt32be (DV.fromArrayBuffer $ TA.buffer i32a) byteIndex
+               == Nothing
+
 newtype NonEmptyUntypedInt8Array = NonEmptyUntypedInt8Array (Array Int)
 instance arbitraryNonEmptyUntypedInt8Array :: Arbitrary NonEmptyUntypedInt8Array where
   arbitrary = NonEmptyUntypedInt8Array <<< 
