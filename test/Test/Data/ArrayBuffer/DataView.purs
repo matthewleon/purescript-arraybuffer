@@ -151,6 +151,30 @@ testDataView = describe "DataView" do
             && DV.getUint16le (DV.fromArrayBuffer $ TA.buffer u16a) byteIndex
                == Nothing
 
+  describe "getUInt16be" $ do
+    it "correctly gets 16-bit unsigned integers" $
+      quickCheck \(NonEmptyUntypedUint16Array xs) ->
+        let u16a = (TA.fromArray xs) :: TA.Uint16Array
+            index = chooseInt 0 (A.length xs - 1)
+        in  index <#> \i ->
+              let byteIndex = i * 2
+                  byteFlippedFromArray =
+                    flip DV.getUint16be 0
+                    =<< DV.fromArrayBuffer <<< TA.buffer
+                    <$> ((TA.fromArray <<< A.singleton <$> A.index xs i)
+                         :: Maybe TA.Uint16Array)
+              in isJust byteFlippedFromArray
+                 && byteFlippedFromArray
+                    == DV.getUint16be (DV.fromArrayBuffer $ TA.buffer u16a) byteIndex
+    it "returns Nothing for out of range index" $
+      quickCheck \(NonEmptyUntypedUint16Array xs) i ->
+        let u16a = (TA.fromArray xs) :: TA.Uint16Array
+            index = A.length xs + i
+            byteIndex = index * 2
+        in  A.index xs index == Nothing
+            && DV.getUint16be (DV.fromArrayBuffer $ TA.buffer u16a) byteIndex
+               == Nothing
+
 newtype NonEmptyUntypedInt8Array = NonEmptyUntypedInt8Array (Array Int)
 instance arbitraryNonEmptyUntypedInt8Array :: Arbitrary NonEmptyUntypedInt8Array where
   arbitrary = NonEmptyUntypedInt8Array <<< 
