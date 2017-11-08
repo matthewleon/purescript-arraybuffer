@@ -73,6 +73,25 @@ testDataView = describe "DataView" do
             && DV.getInt16be (DV.fromArrayBuffer $ TA.buffer i16a) byteIndex
                == Nothing
 
+  describe "getInt32le" $ do
+    it "correctly gets 32-bit integers" $
+      quickCheck \(NonEmptyUntypedInt32Array xs) ->
+        let i32a = (TA.fromArray xs) :: TA.Int32Array
+            index = chooseInt 0 (A.length xs - 1)
+        in  index <#> \i -> 
+              let byteIndex = i * 4
+              in  isJust (A.index xs i)
+                  && A.index xs i
+                     == DV.getInt32le (DV.fromArrayBuffer $ TA.buffer i32a) byteIndex
+    it "returns Nothing for out of range index" $
+      quickCheck \xs i ->
+        let i32a = (TA.fromArray xs) :: TA.Int32Array
+            index = A.length xs + i
+            byteIndex = index * 4
+        in  A.index xs index == Nothing
+            && DV.getInt32le (DV.fromArrayBuffer $ TA.buffer i32a) byteIndex
+               == Nothing
+
 newtype NonEmptyUntypedInt8Array = NonEmptyUntypedInt8Array (Array Int)
 instance arbitraryNonEmptyUntypedInt8Array :: Arbitrary NonEmptyUntypedInt8Array where
   arbitrary = NonEmptyUntypedInt8Array <<< 
@@ -84,3 +103,8 @@ instance arbitraryNonEmptyUntypedInt16Array :: Arbitrary NonEmptyUntypedInt16Arr
   arbitrary = NonEmptyUntypedInt16Array <<< 
     map intToInt16 <$> A.fromFoldable <$> (arbitrary :: Gen (NonEmpty Array Int))
     where intToInt16 x = 32767 - (abs x `mod` 65535)
+
+newtype NonEmptyUntypedInt32Array = NonEmptyUntypedInt32Array (Array Int)
+instance arbitraryNonEmptyUntypedInt32Array :: Arbitrary NonEmptyUntypedInt32Array where
+  arbitrary = NonEmptyUntypedInt32Array <<< A.fromFoldable
+    <$> (arbitrary :: Gen (NonEmpty Array Int))
