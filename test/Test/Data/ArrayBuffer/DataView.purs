@@ -25,7 +25,7 @@ testDataView = describe "DataView" do
               isJust (A.index xs i) &&
               A.index xs i == DV.getInt8 (DV.fromArrayBuffer $ TA.buffer i8a) i
     it "returns Nothing for out of range index" $
-      quickCheck \xs i ->
+      quickCheck \(NonEmptyUntypedInt8Array xs) i ->
         let i8a = (TA.fromArray xs) :: TA.Int8Array
             index = A.length xs + i
         in  A.index xs index == Nothing &&
@@ -42,7 +42,7 @@ testDataView = describe "DataView" do
                   && A.index xs i
                      == DV.getInt16le (DV.fromArrayBuffer $ TA.buffer i16a) byteIndex
     it "returns Nothing for out of range index" $
-      quickCheck \xs i ->
+      quickCheck \(NonEmptyUntypedInt16Array xs) i ->
         let i16a = (TA.fromArray xs) :: TA.Int16Array
             index = A.length xs + i
             byteIndex = index * 2
@@ -66,7 +66,7 @@ testDataView = describe "DataView" do
                  && byteFlippedFromArray
                     == DV.getInt16be (DV.fromArrayBuffer $ TA.buffer i16a) byteIndex
     it "returns Nothing for out of range index" $
-      quickCheck \xs i ->
+      quickCheck \(NonEmptyUntypedInt16Array xs) i ->
         let i16a = (TA.fromArray xs) :: TA.Int16Array
             index = A.length xs + i
             byteIndex = index * 2
@@ -85,7 +85,7 @@ testDataView = describe "DataView" do
                   && A.index xs i
                      == DV.getInt32le (DV.fromArrayBuffer $ TA.buffer i32a) byteIndex
     it "returns Nothing for out of range index" $
-      quickCheck \xs i ->
+      quickCheck \(NonEmptyUntypedInt32Array xs) i ->
         let i32a = (TA.fromArray xs) :: TA.Int32Array
             index = A.length xs + i
             byteIndex = index * 4
@@ -109,7 +109,7 @@ testDataView = describe "DataView" do
                  && byteFlippedFromArray
                     == DV.getInt32be (DV.fromArrayBuffer $ TA.buffer i32a) byteIndex
     it "returns Nothing for out of range index" $
-      quickCheck \xs i ->
+      quickCheck \(NonEmptyUntypedInt32Array xs) i ->
         let i32a = (TA.fromArray xs) :: TA.Int32Array
             index = A.length xs + i
             byteIndex = index * 4
@@ -118,19 +118,38 @@ testDataView = describe "DataView" do
                == Nothing
                
   describe "getUint8" $ do
-    it "correctly gets 8-bit integers" $
+    it "correctly gets 8-bit unsigned integers" $
       quickCheck \(NonEmptyUntypedUint8Array xs) ->
-        let i8a = (TA.fromArray xs) :: TA.Uint8Array
+        let u8a = (TA.fromArray xs) :: TA.Uint8Array
             index = chooseInt 0 (A.length xs - 1)
         in  index <#> \i ->
               isJust (A.index xs i) &&
-              A.index xs i == DV.getUint8 (DV.fromArrayBuffer $ TA.buffer i8a) i
+              A.index xs i == DV.getUint8 (DV.fromArrayBuffer $ TA.buffer u8a) i
     it "returns Nothing for out of range index" $
       quickCheck \(NonEmptyUntypedUint8Array xs) i ->
-        let i8a = (TA.fromArray xs) :: TA.Uint8Array
+        let u8a = (TA.fromArray xs) :: TA.Uint8Array
             index = A.length xs + i
         in  A.index xs index == Nothing &&
-            DV.getUint8 (DV.fromArrayBuffer $ TA.buffer i8a) index == Nothing
+            DV.getUint8 (DV.fromArrayBuffer $ TA.buffer u8a) index == Nothing
+
+  describe "getUint16le" $ do
+    it "correctly gets 16-bit unsigned integers" $
+      quickCheck \(NonEmptyUntypedUint16Array xs) ->
+        let u16a = (TA.fromArray xs) :: TA.Uint16Array
+            index = chooseInt 0 (A.length xs - 1)
+        in  index <#> \i -> 
+              let byteIndex = i * 2
+              in  isJust (A.index xs i)
+                  && A.index xs i
+                     == DV.getUint16le (DV.fromArrayBuffer $ TA.buffer u16a) byteIndex
+    it "returns Nothing for out of range index" $
+      quickCheck \(NonEmptyUntypedUint16Array xs) i ->
+        let u16a = (TA.fromArray xs) :: TA.Uint16Array
+            index = A.length xs + i
+            byteIndex = index * 2
+        in  A.index xs index == Nothing
+            && DV.getUint16le (DV.fromArrayBuffer $ TA.buffer u16a) byteIndex
+               == Nothing
 
 newtype NonEmptyUntypedInt8Array = NonEmptyUntypedInt8Array (Array Int)
 instance arbitraryNonEmptyUntypedInt8Array :: Arbitrary NonEmptyUntypedInt8Array where
@@ -142,7 +161,7 @@ newtype NonEmptyUntypedInt16Array = NonEmptyUntypedInt16Array (Array Int)
 instance arbitraryNonEmptyUntypedInt16Array :: Arbitrary NonEmptyUntypedInt16Array where
   arbitrary = NonEmptyUntypedInt16Array <<< 
     map intToInt16 <$> A.fromFoldable <$> (arbitrary :: Gen (NonEmpty Array Int))
-    where intToInt16 x = 32767 - (abs x `mod` 65535)
+    where intToInt16 x = 32767 - (abs x `mod` 65536)
 
 newtype NonEmptyUntypedInt32Array = NonEmptyUntypedInt32Array (Array Int)
 instance arbitraryNonEmptyUntypedInt32Array :: Arbitrary NonEmptyUntypedInt32Array where
@@ -154,3 +173,9 @@ instance arbitraryNonEmptyUntypedUint8Array :: Arbitrary NonEmptyUntypedUint8Arr
   arbitrary = NonEmptyUntypedUint8Array <<< 
     map intToUint8 <$> A.fromFoldable <$> (arbitrary :: Gen (NonEmpty Array Int))
     where intToUint8 x = U.fromInt x `mod` U.fromInt 256
+
+newtype NonEmptyUntypedUint16Array = NonEmptyUntypedUint16Array (Array U.UInt)
+instance arbitraryNonEmptyUntypedUint16Array :: Arbitrary NonEmptyUntypedUint16Array where
+  arbitrary = NonEmptyUntypedUint16Array <<< 
+    map intToUint16 <$> A.fromFoldable <$> (arbitrary :: Gen (NonEmpty Array Int))
+    where intToUint16 x = U.fromInt x `mod` U.fromInt 65536
