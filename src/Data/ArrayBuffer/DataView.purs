@@ -6,17 +6,17 @@ module Data.ArrayBuffer.DataView (
 , byteOffset
 , getInt8
 , getInt16be
+, getInt16le
 , getInt32be
+, getInt32le
 , getUint8
 , getUint16be
-, getUint32be
-, getFloat32be
-, getFloat64be
-, getInt16le
-, getInt32le
 , getUint16le
 , getUint32le
+, getUint32be
+, getFloat32be
 , getFloat32le
+, getFloat64be
 , getFloat64le
 ) where
 
