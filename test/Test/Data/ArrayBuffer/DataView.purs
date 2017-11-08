@@ -8,6 +8,7 @@ import Data.ArrayBuffer.TypedArray as TA
 import Data.Maybe (Maybe(..), isJust)
 import Data.NonEmpty (NonEmpty)
 import Data.Ord (abs)
+import Data.UInt as U
 import Test.QuickCheck (class Arbitrary, arbitrary)
 import Test.QuickCheck.Gen (Gen, chooseInt)
 import Test.Spec (Spec, describe, it)
@@ -115,6 +116,21 @@ testDataView = describe "DataView" do
         in  A.index xs index == Nothing
             && DV.getInt32be (DV.fromArrayBuffer $ TA.buffer i32a) byteIndex
                == Nothing
+               
+  describe "getUint8" $ do
+    it "correctly gets 8-bit integers" $
+      quickCheck \(NonEmptyUntypedUint8Array xs) ->
+        let i8a = (TA.fromArray xs) :: TA.Uint8Array
+            index = chooseInt 0 (A.length xs - 1)
+        in  index <#> \i ->
+              isJust (A.index xs i) &&
+              A.index xs i == DV.getUint8 (DV.fromArrayBuffer $ TA.buffer i8a) i
+    it "returns Nothing for out of range index" $
+      quickCheck \(NonEmptyUntypedUint8Array xs) i ->
+        let i8a = (TA.fromArray xs) :: TA.Uint8Array
+            index = A.length xs + i
+        in  A.index xs index == Nothing &&
+            DV.getUint8 (DV.fromArrayBuffer $ TA.buffer i8a) index == Nothing
 
 newtype NonEmptyUntypedInt8Array = NonEmptyUntypedInt8Array (Array Int)
 instance arbitraryNonEmptyUntypedInt8Array :: Arbitrary NonEmptyUntypedInt8Array where
@@ -132,3 +148,9 @@ newtype NonEmptyUntypedInt32Array = NonEmptyUntypedInt32Array (Array Int)
 instance arbitraryNonEmptyUntypedInt32Array :: Arbitrary NonEmptyUntypedInt32Array where
   arbitrary = NonEmptyUntypedInt32Array <<< A.fromFoldable
     <$> (arbitrary :: Gen (NonEmpty Array Int))
+
+newtype NonEmptyUntypedUint8Array = NonEmptyUntypedUint8Array (Array U.UInt)
+instance arbitraryNonEmptyUntypedUint8Array :: Arbitrary NonEmptyUntypedUint8Array where
+  arbitrary = NonEmptyUntypedUint8Array <<< 
+    map intToUint8 <$> A.fromFoldable <$> (arbitrary :: Gen (NonEmpty Array Int))
+    where intToUint8 x = U.fromInt x `mod` U.fromInt 256

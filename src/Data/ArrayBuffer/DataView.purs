@@ -23,6 +23,7 @@ module Data.ArrayBuffer.DataView (
 import Data.ArrayBuffer.Types (ArrayBuffer, ByteLength, ByteOffset, DataView)
 import Data.Function.Uncurried (Fn7, runFn7)
 import Data.Maybe (Maybe(..))
+import Data.UInt (UInt)
 
 -- | Type for all fetching functions.
 type Getter r = DataView -> ByteOffset -> Maybe r
@@ -62,21 +63,21 @@ getInt32le :: Getter Int
 getInt32le = getter "getInt32" 4 true
 
 -- | Fetch uint8 value at a certain index in a `DataView`.
-getUint8 :: Getter Int
+getUint8 :: Getter UInt
 getUint8 = getter "getUint8" 1 false
 
 -- | Fetch uint16 value at a certain index in a `DataView`.
-getUint16be :: Getter Int
+getUint16be :: Getter UInt
 getUint16be = getter "getUint16" 2 false
 
-getUint16le :: Getter Int
+getUint16le :: Getter UInt
 getUint16le = getter "getUint16" 2 true
 
 -- | Fetch uint32 value at a certain index in a `DataView`.
-getUint32be :: Getter Int
+getUint32be :: Getter UInt
 getUint32be = getter "getUint32" 4 false
 
-getUint32le :: Getter Int
+getUint32le :: Getter UInt
 getUint32le = getter "getUint32" 4 true
 
 -- | Fetch float32 value at a certain index in a `DataView`.
