@@ -6,11 +6,10 @@ import Data.Array as A
 import Data.ArrayBuffer.DataView as DV
 import Data.ArrayBuffer.TypedArray as TA
 import Data.Maybe (Maybe(..), isJust)
-import Data.NonEmpty (NonEmpty)
 import Data.Ord (abs)
 import Data.UInt as U
 import Test.QuickCheck (class Arbitrary, arbitrary)
-import Test.QuickCheck.Gen (Gen, chooseInt)
+import Test.QuickCheck.Gen (chooseInt, arrayOf1)
 import Test.Spec (Spec, describe, it)
 import Test.Spec.QuickCheck (QCRunnerEffects, quickCheck)
 
@@ -317,38 +316,37 @@ testDataView = describe "DataView" do
 newtype NonEmptyUntypedInt8Array = NonEmptyUntypedInt8Array (Array Int)
 instance arbitraryNonEmptyUntypedInt8Array :: Arbitrary NonEmptyUntypedInt8Array where
   arbitrary = NonEmptyUntypedInt8Array <<<
-    map intToInt8 <$> A.fromFoldable <$> (arbitrary :: Gen (NonEmpty Array Int))
+    map intToInt8 <$> A.fromFoldable <$> arrayOf1 arbitrary
     where intToInt8 x = 127 - (abs x `mod` 256)
 
 newtype NonEmptyUntypedInt16Array = NonEmptyUntypedInt16Array (Array Int)
 instance arbitraryNonEmptyUntypedInt16Array :: Arbitrary NonEmptyUntypedInt16Array where
   arbitrary = NonEmptyUntypedInt16Array <<<
-    map intToInt16 <$> A.fromFoldable <$> (arbitrary :: Gen (NonEmpty Array Int))
+    map intToInt16 <$> A.fromFoldable <$> arrayOf1 arbitrary
     where intToInt16 x = 32767 - (abs x `mod` 65536)
 
 newtype NonEmptyUntypedInt32Array = NonEmptyUntypedInt32Array (Array Int)
 instance arbitraryNonEmptyUntypedInt32Array :: Arbitrary NonEmptyUntypedInt32Array where
   arbitrary = NonEmptyUntypedInt32Array <<< A.fromFoldable
-    <$> (arbitrary :: Gen (NonEmpty Array Int))
+    <$> arrayOf1 arbitrary
 
 newtype NonEmptyUntypedUint8Array = NonEmptyUntypedUint8Array (Array U.UInt)
 instance arbitraryNonEmptyUntypedUint8Array :: Arbitrary NonEmptyUntypedUint8Array where
   arbitrary = NonEmptyUntypedUint8Array <<<
-    map intToUint8 <$> A.fromFoldable <$> (arbitrary :: Gen (NonEmpty Array Int))
+    map intToUint8 <$> A.fromFoldable <$> arrayOf1 arbitrary
     where intToUint8 x = U.fromInt x `mod` U.fromInt 256
 
 newtype NonEmptyUntypedUint16Array = NonEmptyUntypedUint16Array (Array U.UInt)
 instance arbitraryNonEmptyUntypedUint16Array :: Arbitrary NonEmptyUntypedUint16Array where
   arbitrary = NonEmptyUntypedUint16Array <<<
-    map intToUint16 <$> A.fromFoldable <$> (arbitrary :: Gen (NonEmpty Array Int))
+    map intToUint16 <$> A.fromFoldable <$> arrayOf1 arbitrary
     where intToUint16 x = U.fromInt x `mod` U.fromInt 65536
 
 newtype NonEmptyUntypedUint32Array = NonEmptyUntypedUint32Array (Array U.UInt)
 instance arbitraryNonEmptyUntypedUint32Array :: Arbitrary NonEmptyUntypedUint32Array where
   arbitrary = NonEmptyUntypedUint32Array <<<
-    map U.fromInt <$> A.fromFoldable <$> (arbitrary :: Gen (NonEmpty Array Int))
+    map U.fromInt <$> A.fromFoldable <$> arrayOf1 arbitrary
 
 newtype NonEmptyUntypedNumberArray = NonEmptyUntypedNumberArray (Array Number)
 instance arbitraryNonEmptyUntypedNumberArray :: Arbitrary NonEmptyUntypedNumberArray where
-  arbitrary = NonEmptyUntypedNumberArray <<<
-    A.fromFoldable <$> (arbitrary :: Gen (NonEmpty Array Number))
+  arbitrary = NonEmptyUntypedNumberArray <<< A.fromFoldable <$> arrayOf1 arbitrary
