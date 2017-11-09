@@ -32,3 +32,12 @@ testSTDataView = describe "STDataView" do
             Nothing == pureST (
                 flip STDV.getInt8 i =<< STDV.fromArrayBuffer (TA.buffer i8a)
               )
+    it "returns Nothing for negative index" $
+      quickCheck \(TDV.NonEmptyUntypedInt8Array xs) ->
+        let i8a = (TA.fromArray xs) :: TA.Int8Array
+            index = (-1 - _) <$> chooseInt 0 (A.length xs - 1)
+        in  index <#> \i ->
+              A.index xs i == Nothing &&
+              Nothing == pureST (
+                  flip STDV.getInt8 i =<< STDV.fromArrayBuffer (TA.buffer i8a)
+              )
