@@ -2,6 +2,10 @@ module Test.Data.ArrayBuffer.DataView where
 
 import Prelude
 
+{- debugging
+import Control.Monad.Eff.Console (logShow)
+import Control.Monad.Eff.Unsafe (unsafePerformEff)
+-}
 import Data.Array as A
 import Data.ArrayBuffer.DataView as DV
 import Data.ArrayBuffer.TypedArray as TA
@@ -29,6 +33,13 @@ testDataView = describe "DataView" do
             index = A.length xs + i
         in  A.index xs index == Nothing &&
             DV.getInt8 (DV.fromArrayBuffer $ TA.buffer i8a) index == Nothing
+    it "returns Nothing for negative index" $
+      quickCheck \(NonEmptyUntypedInt8Array xs) ->
+        let i8a = (TA.fromArray xs) :: TA.Int8Array
+            index = (-1 - _) <$> (chooseInt 0 (A.length xs - 1))
+        in  index <#> \i ->
+              Nothing == A.index xs i &&
+              Nothing == DV.getInt8 (DV.fromArrayBuffer $ TA.buffer i8a) i
 
   describe "getInt16le" $ do
     it "correctly gets 16-bit integers" $
