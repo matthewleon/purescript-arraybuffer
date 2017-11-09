@@ -6,7 +6,7 @@ import Control.Monad.ST (pureST)
 import Data.Array as A
 import Data.ArrayBuffer.DataView.ST as STDV
 import Data.ArrayBuffer.TypedArray as TA
-import Data.Maybe (isJust)
+import Data.Maybe (Maybe(..), isJust)
 import Test.Data.ArrayBuffer.DataView as TDV
 import Test.QuickCheck.Gen (chooseInt)
 import Test.Spec (Spec, describe, it)
@@ -24,11 +24,11 @@ testSTDataView = describe "STDataView" do
               A.index xs i == pureST (
                 flip STDV.getInt8 i =<< STDV.fromArrayBuffer (TA.buffer i8a)
               )
-              {-
     it "returns Nothing for out of range index" $
-      quickCheck \(NonEmptyUntypedInt8Array xs) i ->
+      quickCheck \(TDV.NonEmptyUntypedInt8Array xs) i ->
         let i8a = (TA.fromArray xs) :: TA.Int8Array
             index = A.length xs + i
         in  A.index xs index == Nothing &&
-            DV.getInt8 (DV.fromArrayBuffer $ TA.buffer i8a) index == Nothing
--}
+            Nothing == pureST (
+                flip STDV.getInt8 i =<< STDV.fromArrayBuffer (TA.buffer i8a)
+              )
