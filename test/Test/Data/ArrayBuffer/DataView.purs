@@ -2,16 +2,14 @@ module Test.Data.ArrayBuffer.DataView where
 
 import Prelude
 
-{- debugging
-import Control.Monad.Eff.Console (logShow)
-import Control.Monad.Eff.Unsafe (unsafePerformEff)
--}
 import Data.Array as A
 import Data.ArrayBuffer.DataView as DV
 import Data.ArrayBuffer.TypedArray as TA
-import Data.Maybe (Maybe(..), isJust)
+import Data.Maybe (Maybe(..), fromJust, isJust)
 import Data.Ord (abs)
 import Data.UInt as U
+import Global (isNaN)
+import Partial.Unsafe (unsafePartial)
 import Test.QuickCheck (class Arbitrary, arbitrary)
 import Test.QuickCheck.Gen (chooseInt, arrayOf1)
 import Test.Spec (Spec, describe, it)
@@ -241,8 +239,9 @@ testDataView = describe "DataView" do
                     <$> ((TA.fromArray <<< A.singleton <$> A.index xs i)
                          :: Maybe TA.Float32Array)
               in isJust float32leFromArray
-                 && float32leFromArray
-                    == DV.getFloat32le (DV.fromArrayBuffer $ TA.buffer f32a) byteIndex
+                 && (float32leFromArray
+                    == DV.getFloat32le (DV.fromArrayBuffer $ TA.buffer f32a) byteIndex)
+                    || isNaN (unsafePartial $ fromJust float32leFromArray)
     it "returns Nothing for out of range index" $
       quickCheck \(NonEmptyUntypedNumberArray xs) i ->
         let f32a = (TA.fromArray xs) :: TA.Float32Array
@@ -265,8 +264,9 @@ testDataView = describe "DataView" do
                     <$> ((TA.fromArray <<< A.singleton <$> A.index xs i)
                          :: Maybe TA.Float32Array)
               in isJust float32beFromArray
-                 && float32beFromArray
-                    == DV.getFloat32be (DV.fromArrayBuffer $ TA.buffer f32a) byteIndex
+                 && ((float32beFromArray
+                    == DV.getFloat32be (DV.fromArrayBuffer $ TA.buffer f32a) byteIndex)
+                    || isNaN (unsafePartial $ fromJust float32beFromArray))
     it "returns Nothing for out of range index" $
       quickCheck \(NonEmptyUntypedNumberArray xs) i ->
         let f32a = (TA.fromArray xs) :: TA.Float32Array
@@ -289,8 +289,8 @@ testDataView = describe "DataView" do
                     <$> ((TA.fromArray <<< A.singleton <$> A.index xs i)
                          :: Maybe TA.Float64Array)
               in isJust float64leFromArray
-                 && float64leFromArray
-                    == DV.getFloat64le (DV.fromArrayBuffer $ TA.buffer f64a) byteIndex
+                 && (float64leFromArray
+                    == DV.getFloat64le (DV.fromArrayBuffer $ TA.buffer f64a) byteIndex)
     it "returns Nothing for out of range index" $
       quickCheck \(NonEmptyUntypedNumberArray xs) i ->
         let f64a = (TA.fromArray xs) :: TA.Float64Array
@@ -313,8 +313,9 @@ testDataView = describe "DataView" do
                     <$> ((TA.fromArray <<< A.singleton <$> A.index xs i)
                          :: Maybe TA.Float64Array)
               in isJust float64beFromArray
-                 && float64beFromArray
-                    == DV.getFloat64be (DV.fromArrayBuffer $ TA.buffer f64a) byteIndex
+                 && ((float64beFromArray
+                    == DV.getFloat64be (DV.fromArrayBuffer $ TA.buffer f64a) byteIndex)
+                    || isNaN (unsafePartial $ fromJust float64beFromArray))
     it "returns Nothing for out of range index" $
       quickCheck \(NonEmptyUntypedNumberArray xs) i ->
         let f64a = (TA.fromArray xs) :: TA.Float64Array
