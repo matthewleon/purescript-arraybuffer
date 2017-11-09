@@ -18,8 +18,10 @@ module Data.ArrayBuffer.DataView (
 , getFloat32le
 , getFloat64be
 , getFloat64le
+, module Data.ArrayBuffer.Types
 ) where
 
+import Data.ArrayBuffer.ArrayBuffer (ByteLength)
 import Data.ArrayBuffer.Types (ArrayBuffer, ByteLength, ByteOffset, DataView)
 import Data.Function.Uncurried (Fn7, runFn7)
 import Data.Maybe (Maybe(..))
@@ -33,7 +35,7 @@ foreign import fromArrayBuffer :: ArrayBuffer -> DataView
 
 foreign import buffer :: DataView -> ArrayBuffer
 
-foreign import byteLength :: DataView -> Int
+foreign import byteLength :: DataView -> ByteLength
 
 foreign import byteOffset :: DataView -> ByteOffset
 

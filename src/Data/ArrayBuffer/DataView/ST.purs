@@ -3,6 +3,9 @@ module Data.ArrayBuffer.DataView.ST (
 , Getter
 --, Setter
 , fromArrayBuffer
+, buffer
+, byteLength
+, byteOffset
 , getInt8
 , getInt16be
 , getInt16le
@@ -23,7 +26,7 @@ import Prelude
 
 import Control.Monad.Eff (Eff)
 import Control.Monad.ST (ST)
-import Data.ArrayBuffer.ArrayBuffer (ArrayBuffer)
+import Data.ArrayBuffer.ArrayBuffer (ArrayBuffer, ByteLength)
 import Data.ArrayBuffer.DataView as DV
 import Data.ArrayBuffer.Types (ByteOffset)
 import Data.Maybe (Maybe)
@@ -40,6 +43,15 @@ type Getter a =
   -> Eff (st :: ST h | r) (Maybe a)
 
 foreign import fromArrayBuffer :: forall h r. ArrayBuffer -> Eff (st :: ST h | r) (STDataView h)
+
+buffer :: forall h r. STDataView h -> Eff (st :: ST h | r) ArrayBuffer
+buffer = liftFromDV DV.buffer
+
+byteLength :: forall h r. STDataView h -> Eff (st :: ST h | r) ByteLength
+byteLength = liftFromDV DV.byteLength
+
+byteOffset :: forall h r. STDataView h -> Eff (st :: ST h | r) ByteOffset
+byteOffset = liftFromDV DV.byteOffset
 
 getInt8 :: Getter Int
 getInt8 = useImmutableGetter DV.getInt8
@@ -82,6 +94,12 @@ getFloat64be = useImmutableGetter DV.getFloat64be
 
 getFloat64le :: Getter Number
 getFloat64le = useImmutableGetter DV.getFloat64le
+
+liftFromDV
+  :: forall a
+   . (DV.DataView -> a)
+  -> forall h r. STDataView h -> Eff (st :: ST h | r) a
+liftFromDV f = pure <<< f <<< unsafeCoerce
 
 useImmutableGetter :: forall a. DV.Getter a -> Getter a
 useImmutableGetter g dv = pure <<< g (unsafeCoerce dv)
