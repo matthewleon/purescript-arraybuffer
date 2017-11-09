@@ -234,8 +234,8 @@ testDataView = describe "DataView" do
                  && float32leFromArray
                     == DV.getFloat32le (DV.fromArrayBuffer $ TA.buffer f32a) byteIndex
     it "returns Nothing for out of range index" $
-      quickCheck \(NonEmptyUntypedUint32Array xs) i ->
-        let f32a = (TA.fromArray xs) :: TA.Uint32Array
+      quickCheck \(NonEmptyUntypedNumberArray xs) i ->
+        let f32a = (TA.fromArray xs) :: TA.Float32Array
             index = A.length xs + i
             byteIndex = index * 4
         in  A.index xs index == Nothing
@@ -258,12 +258,60 @@ testDataView = describe "DataView" do
                  && float32beFromArray
                     == DV.getFloat32be (DV.fromArrayBuffer $ TA.buffer f32a) byteIndex
     it "returns Nothing for out of range index" $
-      quickCheck \(NonEmptyUntypedUint32Array xs) i ->
-        let f32a = (TA.fromArray xs) :: TA.Uint32Array
+      quickCheck \(NonEmptyUntypedNumberArray xs) i ->
+        let f32a = (TA.fromArray xs) :: TA.Float32Array
             index = A.length xs + i
             byteIndex = index * 4
         in  A.index xs index == Nothing
             && DV.getUint32be (DV.fromArrayBuffer $ TA.buffer f32a) byteIndex
+               == Nothing
+
+  describe "getFloat64le" $ do
+    it "correctly gets 64-bit float" $
+      quickCheck \(NonEmptyUntypedNumberArray xs) ->
+        let f64a = (TA.fromArray xs) :: TA.Float64Array
+            index = chooseInt 0 (A.length xs - 1)
+        in  index <#> \i ->
+              let byteIndex = i * 8
+                  float64leFromArray =
+                    flip DV.getFloat64le 0
+                    =<< DV.fromArrayBuffer <<< TA.buffer
+                    <$> ((TA.fromArray <<< A.singleton <$> A.index xs i)
+                         :: Maybe TA.Float64Array)
+              in isJust float64leFromArray
+                 && float64leFromArray
+                    == DV.getFloat64le (DV.fromArrayBuffer $ TA.buffer f64a) byteIndex
+    it "returns Nothing for out of range index" $
+      quickCheck \(NonEmptyUntypedNumberArray xs) i ->
+        let f64a = (TA.fromArray xs) :: TA.Float64Array
+            index = A.length xs + i
+            byteIndex = index * 8
+        in  A.index xs index == Nothing
+            && DV.getFloat64le (DV.fromArrayBuffer $ TA.buffer f64a) byteIndex
+               == Nothing
+
+  describe "getFloat64be" $ do
+    it "correctly gets 64-bit float" $
+      quickCheck \(NonEmptyUntypedNumberArray xs) ->
+        let f64a = (TA.fromArray xs) :: TA.Float64Array
+            index = chooseInt 0 (A.length xs - 1)
+        in  index <#> \i ->
+              let byteIndex = i * 8
+                  float64beFromArray =
+                    flip DV.getFloat64be 0
+                    =<< DV.fromArrayBuffer <<< TA.buffer
+                    <$> ((TA.fromArray <<< A.singleton <$> A.index xs i)
+                         :: Maybe TA.Float64Array)
+              in isJust float64beFromArray
+                 && float64beFromArray
+                    == DV.getFloat64be (DV.fromArrayBuffer $ TA.buffer f64a) byteIndex
+    it "returns Nothing for out of range index" $
+      quickCheck \(NonEmptyUntypedNumberArray xs) i ->
+        let f64a = (TA.fromArray xs) :: TA.Float64Array
+            index = A.length xs + i
+            byteIndex = index * 8
+        in  A.index xs index == Nothing
+            && DV.getFloat64be (DV.fromArrayBuffer $ TA.buffer f64a) byteIndex
                == Nothing
 
 newtype NonEmptyUntypedInt8Array = NonEmptyUntypedInt8Array (Array Int)
