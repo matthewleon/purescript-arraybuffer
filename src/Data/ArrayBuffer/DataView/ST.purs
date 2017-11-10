@@ -1,11 +1,13 @@
 module Data.ArrayBuffer.DataView.ST (
   STDataView
 , Getter
---, Setter
+, Setter
+
 , fromArrayBuffer
 , buffer
 , byteLength
 , byteOffset
+
 , getInt8
 , getInt16be
 , getInt16le
@@ -20,6 +22,23 @@ module Data.ArrayBuffer.DataView.ST (
 , getFloat32le
 , getFloat64be
 , getFloat64le
+
+, setInt8
+{-
+, setInt16be
+, setInt16le
+, setInt32be
+, setInt32le
+, setUint8
+, setUint16be
+, setUint16le
+, setUint32le
+, setUint32be
+, setFloat32be
+, setFloat32le
+, setFloat64be
+, setFloat64le
+-}
 ) where
 
 import Prelude
@@ -37,10 +56,18 @@ foreign import data STDataView :: Type -> Type
 
 -- | Type for all fetching functions.
 type Getter a =
-    forall h r
+     forall h r
    . STDataView h
   -> ByteOffset
   -> Eff (st :: ST h | r) (Maybe a)
+
+-- | Type for all setting functions. Boolean result indicates success.
+type Setter a =
+     forall h r
+   . STDataView h
+  -> ByteOffset
+  -> a
+  -> Eff (st :: ST h | r) Boolean
 
 foreign import fromArrayBuffer :: forall h r. ArrayBuffer -> Eff (st :: ST h | r) (STDataView h)
 
@@ -95,6 +122,9 @@ getFloat64be = useImmutableGetter DV.getFloat64be
 getFloat64le :: Getter Number
 getFloat64le = useImmutableGetter DV.getFloat64le
 
+setInt8 :: Setter Int
+setInt8 = setter "setInt8" false
+
 liftFromDV
   :: forall a
    . (DV.DataView -> a)
@@ -103,3 +133,7 @@ liftFromDV f = pure <<< f <<< unsafeCoerce
 
 useImmutableGetter :: forall a. DV.Getter a -> Getter a
 useImmutableGetter g dv = pure <<< g (unsafeCoerce dv)
+
+type Endianness = Boolean
+
+foreign import setter :: forall a. String -> Endianness -> Setter a
