@@ -4,7 +4,7 @@ exports.fromArrayBuffer = function(arrayBuffer) {
   return new DataView(arrayBuffer);
 };
 
-exports.getterImpl = function(just, nothing, getterName, length, endianness, dataView, offset) {
+exports.getterImpl = function(just, nothing, getterName, endianness, dataView, offset) {
   try {
     return just(dataView[getterName](offset, endianness));
   }
