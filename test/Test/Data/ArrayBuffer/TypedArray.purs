@@ -39,6 +39,14 @@ testTypedArray = describe "TypedArray" do
         quickCheck \xs ->
           arbitrary `suchThat` notEq xs <#> \ys ->
             not $ TA.fromArray xs `TA.eq` (TA.fromArray ys :: TA.Int32Array)
+    describe "Float64Array" do
+      it "returns true when equal" $
+        quickCheck \xs ->
+          TA.fromArray xs `TA.eq` (TA.fromArray xs :: TA.Float64Array)
+      it "returns false when unequal" $
+        quickCheck \xs ->
+          arbitrary `suchThat` notEq xs <#> \ys ->
+            not $ TA.fromArray xs `TA.eq` (TA.fromArray ys :: TA.Float64Array)
   describe "notEq" $ do
     describe "Int8Array" do
       it "returns false for equal" $
@@ -68,3 +76,11 @@ testTypedArray = describe "TypedArray" do
         quickCheck \xs ->
           arbitrary `suchThat` notEq xs <#> \ys ->
             TA.fromArray xs `TA.notEq` (TA.fromArray ys :: TA.Int32Array)
+    describe "Float64Array" do
+      it "returns false for equal" $
+        quickCheck \xs ->
+          not $ TA.fromArray xs `TA.notEq` (TA.fromArray xs :: TA.Float64Array)
+      it "returns true for unequal" $
+        quickCheck \xs ->
+          arbitrary `suchThat` notEq xs <#> \ys ->
+            TA.fromArray xs `TA.notEq` (TA.fromArray ys :: TA.Float64Array)
