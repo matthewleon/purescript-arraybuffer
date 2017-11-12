@@ -11,7 +11,7 @@ import Data.UInt as U
 import Global (isNaN)
 import Partial.Unsafe (unsafePartial)
 import Test.QuickCheck (class Arbitrary, arbitrary)
-import Test.QuickCheck.Gen (chooseInt, arrayOf1)
+import Test.QuickCheck.Gen (Gen, arrayOf1, chooseInt)
 import Test.Spec (Spec, describe, it)
 import Test.Spec.QuickCheck (QCRunnerEffects, quickCheck)
 
@@ -325,17 +325,19 @@ testDataView = describe "DataView" do
             && DV.getFloat64be (DV.fromArrayBuffer $ TA.buffer f64a) byteIndex
                == Nothing
 
+genInt8 :: Gen Int
+genInt8 = arbitrary <#> \x -> 127 - (abs x `mod` 256)
+
+genInt16 :: Gen Int
+genInt16 = arbitrary <#> \x -> 32767 - (abs x `mod` 65536)
+
 newtype NonEmptyUntypedInt8Array = NonEmptyUntypedInt8Array (Array Int)
 instance arbitraryNonEmptyUntypedInt8Array :: Arbitrary NonEmptyUntypedInt8Array where
-  arbitrary = NonEmptyUntypedInt8Array <<<
-    map intToInt8 <$> A.fromFoldable <$> arrayOf1 arbitrary
-    where intToInt8 x = 127 - (abs x `mod` 256)
+  arbitrary = NonEmptyUntypedInt8Array <<< A.fromFoldable <$> arrayOf1 genInt8
 
 newtype NonEmptyUntypedInt16Array = NonEmptyUntypedInt16Array (Array Int)
 instance arbitraryNonEmptyUntypedInt16Array :: Arbitrary NonEmptyUntypedInt16Array where
-  arbitrary = NonEmptyUntypedInt16Array <<<
-    map intToInt16 <$> A.fromFoldable <$> arrayOf1 arbitrary
-    where intToInt16 x = 32767 - (abs x `mod` 65536)
+  arbitrary = NonEmptyUntypedInt16Array <<< A.fromFoldable <$> arrayOf1 genInt16
 
 newtype NonEmptyUntypedInt32Array = NonEmptyUntypedInt32Array (Array Int)
 instance arbitraryNonEmptyUntypedInt32Array :: Arbitrary NonEmptyUntypedInt32Array where
