@@ -1,6 +1,7 @@
 module Data.ArrayBuffer.ArrayBuffer (
   byteLength
 , slice
+--, isView
 , module Data.ArrayBuffer.Types
 ) where
 
