@@ -84,6 +84,7 @@ module Data.ArrayBuffer.TypedArray (
 
 -- typeclassy methods
 , show
+, eq
 , every
 , map
 , foldl
@@ -96,10 +97,11 @@ module Data.ArrayBuffer.TypedArray (
 import Prelude
 
 import Data.Array as A
+import Data.ArrayBuffer.TypedArray.Class (class IsArrayType, Constructor, constructor)
 import Data.ArrayBuffer.TypedArray.Raw as Raw
 import Data.ArrayBuffer.Types (ArrayBuffer, ArrayView, ByteOffset, Int8Array, Uint8Array, Uint8ClampedArray, Int16Array, Uint16Array, Int32Array, Uint32Array, Float32Array, Float64Array)
-import Data.ArrayBuffer.TypedArray.Class (class IsArrayType, Constructor, constructor)
-import Data.Maybe (Maybe(..))
+import Data.Maybe (Maybe(..), fromJust)
+import Partial.Unsafe (unsafePartial)
 import Unsafe.Coerce (unsafeCoerce)
 
 foreign import fromArray :: forall t m. IsArrayType t m => Array m -> t
@@ -168,6 +170,10 @@ infixl 8 index as !!
 
 show :: forall t. ArrayView t -> String
 show xs = "fromArray [" <> Raw.toString xs <> "]"
+
+eq :: forall t m. IsArrayType (ArrayView t) m => Eq m => ArrayView t -> ArrayView t -> Boolean
+eq xs ys = byteLength xs == byteLength ys && flip Raw.every xs \x i _ ->
+  x == unsafePartial (fromJust $ ys !! i)
 
 foreign import every :: forall t m. IsArrayType t m => (m -> Boolean) -> t -> Boolean
 
