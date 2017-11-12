@@ -2,22 +2,27 @@ module Test.Data.ArrayBuffer.TypedArray where
 
 import Prelude
 
-import Control.Monad.Eff (Eff)
-import Control.Monad.Eff.Console (CONSOLE, log, logShow)
 import Data.ArrayBuffer.TypedArray as TA
-import Data.Maybe (Maybe)
+import Test.QuickCheck.Arbitrary (arbitrary)
+import Test.QuickCheck.Gen (suchThat)
+import Test.Spec (Spec, describe, it)
+import Test.Spec.QuickCheck (QCRunnerEffects, quickCheck)
 
-testTypedArray :: forall e. Eff ( console :: CONSOLE | e ) Unit
-testTypedArray =
-  let arr = [100, 101, 102, 103]
-      i8a :: TA.Int8Array
-      i8a = TA.fromArray arr
-      ab  = TA.buffer i8a
-  in do
-    log $ TA.show (TA.fromArrayBuffer ab :: TA.Int8Array)
-    log $ TA.show (TA.fromArrayBuffer ab :: TA.Int16Array)
-    log $ TA.show (TA.fromArrayBuffer ab :: TA.Int32Array)
-    logShow $ TA.show <$> (TA.fromArrayBufferWithOffset ab 2 :: Maybe TA.Int8Array)
-    logShow $ TA.show <$> (TA.fromArrayBufferWithOffsetAndLength ab 2 2 :: Maybe TA.Int8Array)
-    logShow $ TA.show <$> (TA.fromArrayBufferWithOffsetAndLength ab 2 3 :: Maybe TA.Int8Array)
-    logShow $ TA.show <$> (TA.fromArrayBufferWithOffsetAndLength ab 3 3 :: Maybe TA.Int8Array)
+testTypedArray :: Spec (QCRunnerEffects ()) Unit
+testTypedArray = describe "TypedArray" do
+  describe "eq" $ do
+    it "returns true for equal Int32Arrays" $
+      quickCheck \xs ->
+        TA.fromArray xs `TA.eq` (TA.fromArray xs :: TA.Int32Array)
+    it "returns false for unequal Int32Arrays" $
+      quickCheck \xs ->
+        arbitrary `suchThat` notEq xs <#> \ys ->
+          not $ TA.fromArray xs `TA.eq` (TA.fromArray ys :: TA.Int32Array)
+  describe "notEq" $ do
+    it "returns false for equal Int32Arrays" $
+      quickCheck \xs ->
+        not $ TA.fromArray xs `TA.notEq` (TA.fromArray xs :: TA.Int32Array)
+    it "returns true for unequal Int32Arrays" $
+      quickCheck \xs ->
+        arbitrary `suchThat` notEq xs <#> \ys ->
+          TA.fromArray xs `TA.notEq` (TA.fromArray ys :: TA.Int32Array)

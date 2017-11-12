@@ -85,6 +85,7 @@ module Data.ArrayBuffer.TypedArray (
 -- typeclassy methods
 , show
 , eq
+, notEq
 , every
 , map
 , foldl
@@ -94,7 +95,7 @@ module Data.ArrayBuffer.TypedArray (
 , module Data.ArrayBuffer.TypedArray.Class
 ) where
 
-import Prelude
+import Prelude hiding (eq, notEq)
 
 import Data.Array as A
 import Data.ArrayBuffer.TypedArray.Class (class IsArrayType, Constructor, constructor)
@@ -174,6 +175,9 @@ show xs = "fromArray [" <> Raw.toString xs <> "]"
 eq :: forall t m. IsArrayType (ArrayView t) m => Eq m => ArrayView t -> ArrayView t -> Boolean
 eq xs ys = byteLength xs == byteLength ys && flip Raw.every xs \x i _ ->
   x == unsafePartial (fromJust $ ys !! i)
+
+notEq :: forall t m. IsArrayType (ArrayView t) m => Eq m => ArrayView t -> ArrayView t -> Boolean
+notEq xs ys = xs `eq` ys == false
 
 foreign import every :: forall t m. IsArrayType t m => (m -> Boolean) -> t -> Boolean
 

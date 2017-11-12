@@ -5,12 +5,13 @@ import Prelude
 import Control.Monad.Eff (Eff)
 import Test.Data.ArrayBuffer.DataView (testDataView)
 import Test.Data.ArrayBuffer.DataView.ST (testSTDataView)
+import Test.Data.ArrayBuffer.TypedArray (testTypedArray)
 import Test.Spec.QuickCheck (QCRunnerEffects)
 import Test.Spec.Reporter (consoleReporter)
 import Test.Spec.Runner (run)
---import Test.Data.ArrayBuffer.TypedArray (testTypedArray)
 
 main :: Eff (QCRunnerEffects ()) Unit
 main = run [consoleReporter] do
   testDataView
   testSTDataView
+  testTypedArray
