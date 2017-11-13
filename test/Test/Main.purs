@@ -3,6 +3,7 @@ module Test.Main where
 import Prelude
 
 import Control.Monad.Eff (Eff)
+import Test.Data.ArrayBuffer.ArrayBuffer (testArrayBuffer)
 import Test.Data.ArrayBuffer.DataView (testDataView)
 import Test.Data.ArrayBuffer.DataView.ST (testSTDataView)
 import Test.Data.ArrayBuffer.TypedArray (testTypedArray)
@@ -12,6 +13,7 @@ import Test.Spec.Runner (run)
 
 main :: Eff (QCRunnerEffects ()) Unit
 main = run [consoleReporter] do
+  testArrayBuffer
   testDataView
   testSTDataView
   testTypedArray
